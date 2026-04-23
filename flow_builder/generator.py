@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import urllib.error
 import urllib.request
 from textwrap import dedent
 
@@ -16,14 +17,16 @@ class BlueprintGenerator:
 
     @property
     def mode(self) -> str:
-        if self.settings.openai_api_key:
+        if self.settings.gemini_api_key or self.settings.openai_api_key:
             return "live"
 
         return "mock"
 
 
-    def generate(self, process_description: str) -> dict:
-        if self.settings.openai_api_key:
+    def generate(self, process_description: str, history: list | None = None) -> dict:
+        if self.settings.gemini_api_key:
+            blueprint = self._generate_with_gemini(process_description, history or [])
+        elif self.settings.openai_api_key:
             blueprint = self._generate_with_openai(process_description)
         else:
             blueprint = self._generate_mock_blueprint(process_description)
@@ -35,6 +38,68 @@ class BlueprintGenerator:
             raise ValueError(f"Generated blueprint failed validation: {joined_errors}")
 
         return blueprint
+
+
+    def _gemini_schema(self, schema: dict) -> dict:
+        """Strip additionalProperties — Gemini's response_schema doesn't support it."""
+        cleaned = {k: v for k, v in schema.items() if k != "additionalProperties"}
+
+        if "properties" in cleaned:
+            cleaned["properties"] = {
+                k: self._gemini_schema(v) for k, v in cleaned["properties"].items()
+            }
+
+        if "items" in cleaned:
+            cleaned["items"] = self._gemini_schema(cleaned["items"])
+
+        return cleaned
+
+
+    def _generate_with_gemini(self, process_description: str, history: list | None = None) -> dict:
+        url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{self.settings.gemini_model}:generateContent"
+            f"?key={self.settings.gemini_api_key}"
+        )
+
+        contents = []
+        for msg in (history or []):
+            role = msg.get("role")
+            content = msg.get("content", "")
+            if role in ("user", "model"):
+                contents.append({"role": role, "parts": [{"text": content}]})
+
+        contents.append({"role": "user", "parts": [{"text": build_user_prompt(process_description)}]})
+
+        payload = {
+            "system_instruction": {
+                "parts": [{"text": SYSTEM_PROMPT}],
+            },
+            "contents": contents,
+            "generationConfig": {
+                "response_mime_type": "application/json",
+                "response_schema": self._gemini_schema(FLOW_BLUEPRINT_SCHEMA),
+            },
+        }
+
+        req = urllib.request.Request(
+            url,
+            data = json.dumps(payload).encode("utf-8"),
+            headers = {"Content-Type": "application/json"},
+            method = "POST",
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout = self.settings.request_timeout_seconds) as response:
+                raw = response.read().decode("utf-8")
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8")
+            raise ValueError(f"Gemini API error {e.code}: {body}") from e
+
+        parsed = json.loads(raw)
+        output_text = parsed["candidates"][0]["content"]["parts"][0]["text"]
+
+        return json.loads(output_text)
 
 
     def _generate_with_openai(self, process_description: str) -> dict:

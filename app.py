@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -30,6 +34,7 @@ def health():
         {
             "ok": True,
             "mode": generator.mode,
+            "demo_enabled": os.environ.get("DEMO_MODE", "false").lower() == "true",
         }
     )
 
@@ -47,12 +52,13 @@ def scenarios():
 def generate():
     body = request.get_json(silent = True) or {}
     user_input = str(body.get("prompt", "")).strip()
+    history = body.get("history", [])
 
     if not user_input:
         return jsonify({"error": "Prompt is required"}), 400
 
     try:
-        blueprint = generator.generate(user_input)
+        blueprint = generator.generate(user_input, history=history)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 500
 

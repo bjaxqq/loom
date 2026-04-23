@@ -7,7 +7,7 @@ The current version is built around a narrow first scope:
 - plain-English input
 - structured Flow draft output
 - five supported Flow patterns
-- local mock mode and optional OpenAI mode
+- local mock mode and optional Gemini (or OpenAI) live mode
 
 
 ## What it does
@@ -111,17 +111,16 @@ http://127.0.0.1:8000
 ```
 
 
-## OpenAI mode
+## Live mode
 
-Set your key before starting the app:
+Loom checks for `GEMINI_API_KEY` first, then `OPENAI_API_KEY`. Set whichever you have before starting:
 
 ```bash
-export OPENAI_API_KEY="your_key_here"
-export OPENAI_MODEL="gpt-4.1-mini"
+export GEMINI_API_KEY="your_key_here"
 .venv/bin/python app.py
 ```
 
-If `OPENAI_API_KEY` is not set, Loom falls back to mock mode.
+If neither key is set, Loom runs in mock mode automatically.
 
 
 ## Deployment
