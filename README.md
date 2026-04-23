@@ -1,101 +1,56 @@
-# Loom
+# loom
 
-Loom is a web app that turns plain-English business process descriptions into Salesforce Flow drafts.
+Loom turns plain-English business process descriptions into structured Salesforce Flow blueprints.
 
-The current version is built around a narrow first scope:
-
-- plain-English input
-- structured Flow draft output
-- five supported Flow patterns
-- local mock mode and optional Gemini (or OpenAI) live mode
+Live at: [loom-bjaxqq.vercel.app](https://loom-bjaxqq.vercel.app)
 
 
 ## What it does
 
-You type a workflow request such as:
+Type a workflow description such as:
 
 > When a lead is converted, create a follow-up task and send a welcome email
 
-Loom returns a structured draft with:
+Loom returns a structured blueprint with:
 
-- flow name
-- flow type
-- primary object
-- trigger
-- entry rules
-- flow steps
-- notes
+- flow name, type, and primary object
+- trigger and entry conditions
+- step-by-step flow map with color-coded nodes
+- patterns used
+- implementation notes
+- exportable JSON and Markdown
 
-The goal is not direct Salesforce deployment yet. The goal is a clean draft an admin can review and build from.
+Blueprints are drafts for review. The goal is a clean starting point an admin can build from in Salesforce Flow Builder.
 
 
-## Current scope
+## Supported patterns
 
-Supported patterns:
-
-- record creation triggers
-- field updates
-- task creation
-- email alerts
-- decision branching
-
-Out of scope for this version:
-
-- direct Salesforce API deployment
-- saved sessions
-- authentication
-- subflows
-- complex loops
+- Record creation triggers
+- Field updates
+- Task creation
+- Email alerts
+- Decision branching
 
 
 ## Stack
 
-- Python
-- Flask
-- HTML
-- CSS
-- JavaScript
+- Python + Flask
+- Gemini API (gemini-2.5-flash) for blueprint generation
+- Vanilla HTML, CSS, JavaScript
 - Vercel for deployment
-
-
-## Project structure
-
-`app.py`
-
-- Flask app for routes and static file serving
-
-`api/`
-
-- Vercel entrypoint
-
-`flow_builder/`
-
-- prompt logic
-- schema and validation
-- generation logic
-- sample scenarios
-
-`static/`
-
-- frontend UI
-
-`tests/`
-
-- basic generator tests
 
 
 ## Run locally
 
-Create a virtual environment:
-
 ```bash
 python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 ```
 
-Install dependencies:
+Add a `.env` file:
 
-```bash
-.venv/bin/pip install -r requirements.txt
+```
+GEMINI_API_KEY=your_key_here
 ```
 
 Start the app:
@@ -104,44 +59,19 @@ Start the app:
 .venv/bin/python app.py
 ```
 
-Then open:
+Open `http://127.0.0.1:8000`.
 
-```text
-http://127.0.0.1:8000
-```
-
-
-## Live mode
-
-Loom checks for `GEMINI_API_KEY` first, then `OPENAI_API_KEY`. Set whichever you have before starting:
-
-```bash
-export GEMINI_API_KEY="your_key_here"
-.venv/bin/python app.py
-```
-
-If neither key is set, Loom runs in mock mode automatically.
+If no API key is set, Loom runs in mock mode automatically.
 
 
 ## Deployment
 
-This project is set up for Vercel with:
-
-- `vercel.json`
-- `api/index.py`
-- `requirements.txt`
-
-That keeps local development and deployment on the same app shape.
+Deployed on Vercel using `vercel.json` and `api/index.py`. Set `GEMINI_API_KEY` in the Vercel dashboard under Settings → Environment Variables.
 
 
-## Next steps
+## Out of scope (v1)
 
-- add evaluation for five required test cases
-- improve output consistency for common Salesforce objects
-- tighten prompt guardrails and validation
-- add report assets and demo documentation
-
-
-## Notes
-
-This project started as a final project build and is being kept in repo form so it can keep evolving over time.
+- Direct Salesforce API deployment
+- Saved sessions
+- Authentication
+- Subflows
