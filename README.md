@@ -1,65 +1,107 @@
 # Loom
 
-Loom is a web app for turning plain-English business process descriptions into Salesforce Flow drafts.
+Loom is a web app that turns plain-English business process descriptions into Salesforce Flow drafts.
 
-It gives you:
+The current version is built around a narrow first scope:
 
-- A lightweight web UI for plain-English process input
-- Structured Salesforce Flow draft output
-- A bounded version 1 scope that matches proposal
-- OpenAI integration when `OPENAI_API_KEY` is set
-- Mock mode fallback for demos, testing, and iteration
-
-
-## Project shape
-
-`app.py`
-
-- Small Python server
-- Serves static frontend
-- Exposes `/api/health` and `/api/generate`
-
-`flow_builder/`
-
-- `config.py` for env-based settings
-- `prompts.py` for system prompt and user prompt assembly
-- `schema.py` for v1 output shape and validation
-- `generator.py` for live generation and mock fallback
-- `mock_data.py` for seeded test scenarios
-
-`static/`
-
-- Input form
-- Demo scenarios
-- Structured result view
-- Raw JSON view for debugging and validation
+- plain-English input
+- structured Flow draft output
+- five supported Flow patterns
+- local mock mode and optional OpenAI mode
 
 
-## Version 1 scope
+## What it does
+
+You type a workflow request such as:
+
+> When a lead is converted, create a follow-up task and send a welcome email
+
+Loom returns a structured draft with:
+
+- flow name
+- flow type
+- primary object
+- trigger
+- entry rules
+- flow steps
+- notes
+
+The goal is not direct Salesforce deployment yet. The goal is a clean draft an admin can review and build from.
+
+
+## Current scope
 
 Supported patterns:
 
-- Record creation triggers
-- Field updates
-- Task creation
-- Email alerts
-- Decision branching
+- record creation triggers
+- field updates
+- task creation
+- email alerts
+- decision branching
 
-Explicitly out of scope:
+Out of scope for this version:
 
-- Direct Salesforce API deployment
-- Multi-turn saved conversations
-- User auth
-- Subflows
-- Complex loops
+- direct Salesforce API deployment
+- saved sessions
+- authentication
+- subflows
+- complex loops
 
 
-## Run it
+## Stack
 
-From project folder:
+- Python
+- Flask
+- HTML
+- CSS
+- JavaScript
+- Vercel for deployment
+
+
+## Project structure
+
+`app.py`
+
+- Flask app for routes and static file serving
+
+`api/`
+
+- Vercel entrypoint
+
+`flow_builder/`
+
+- prompt logic
+- schema and validation
+- generation logic
+- sample scenarios
+
+`static/`
+
+- frontend UI
+
+`tests/`
+
+- basic generator tests
+
+
+## Run locally
+
+Create a virtual environment:
 
 ```bash
-python3 app.py
+python3 -m venv .venv
+```
+
+Install dependencies:
+
+```bash
+.venv/bin/pip install -r requirements.txt
+```
+
+Start the app:
+
+```bash
+.venv/bin/python app.py
 ```
 
 Then open:
@@ -69,32 +111,38 @@ http://127.0.0.1:8000
 ```
 
 
-## Live OpenAI mode
+## OpenAI mode
 
-Set env vars before starting server:
+Set your key before starting the app:
 
 ```bash
 export OPENAI_API_KEY="your_key_here"
 export OPENAI_MODEL="gpt-4.1-mini"
-python3 app.py
+.venv/bin/python app.py
 ```
 
-Without an API key, app runs in mock mode automatically.
+If `OPENAI_API_KEY` is not set, Loom falls back to mock mode.
 
 
-## Why mock mode matters
+## Deployment
 
-Mock mode gives you a stable fallback when:
+This project is set up for Vercel with:
 
-- You want to demo app without spending API credits
-- Network access is unavailable
-- You need predictable output for class screenshots
-- You want to validate front-end flow before tuning prompts
+- `vercel.json`
+- `api/index.py`
+- `requirements.txt`
+
+That keeps local development and deployment on the same app shape.
 
 
-## Suggested next steps
+## Next steps
 
-1. Add a small evaluation script for five required test scenarios
-2. Tighten field-level output for common Salesforce objects
-3. Add richer prompt guardrails for component naming
-4. Export blueprint as Markdown or PDF for submission artifacts
+- add evaluation for five required test cases
+- improve output consistency for common Salesforce objects
+- tighten prompt guardrails and validation
+- add report assets and demo documentation
+
+
+## Notes
+
+This project started as a final project build and is being kept in repo form so it can keep evolving over time.
