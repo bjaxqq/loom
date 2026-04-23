@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loom</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <h1>Loom</h1>
+          <p class="lede">
+            Type process on left and build a flow draft on right
+          </p>
+        </div>
+
+        <section class="sidebar-panel composer">
+          <div class="panel-head">
+            <div>
+              <h2>Describe flow</h2>
+              <p>Use one test prompt or write your own</p>
+            </div>
+          </div>
+
+          <form id="prompt-form">
+            <label class="field">
+              <span>Business process</span>
+              <textarea
+                id="prompt-input"
+                name="prompt"
+                rows="10"
+                placeholder="Example: When a lead is converted, create a follow-up task and send a welcome email"
+              ></textarea>
+            </label>
+
+            <div class="actions">
+              <button type="submit" id="generate-button">Build flow</button>
+              <button type="button" class="secondary" id="clear-button">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="sidebar-panel scenarios">
+          <div class="panel-head">
+            <div>
+              <h2>Test prompts</h2>
+              <p>Good for quick checks</p>
+            </div>
+          </div>
+
+          <div class="scenario-grid" id="scenario-grid"></div>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <header class="workspace-topbar">
+          <div>
+            <p class="workspace-kicker">Right panel</p>
+            <h2>Flow Draft</h2>
+          </div>
+        </header>
+
+        <section class="canvas-panel">
+          <div id="empty-state" class="empty-state">
+            <p>Enter a prompt on left to build a draft</p>
+          </div>
+
+          <div id="result-view" class="result-view hidden">
+            <div class="workspace-grid">
+              <section class="workspace-card">
+                <div class="summary-grid">
+                  <article class="summary-card">
+                    <span class="summary-label">Flow name</span>
+                    <strong id="flow-name"></strong>
+                  </article>
+
+                  <article class="summary-card">
+                    <span class="summary-label">Flow type</span>
+                    <strong id="flow-type"></strong>
+                  </article>
+
+                  <article class="summary-card">
+                    <span class="summary-label">Primary object</span>
+                    <strong id="primary-object"></strong>
+                  </article>
+
+                  <article class="summary-card">
+                    <span class="summary-label">Trigger</span>
+                    <strong id="trigger"></strong>
+                  </article>
+                </div>
+              </section>
+
+              <section class="workspace-card flow-canvas-card">
+                <div class="flow-canvas-head">
+                  <h3>Flow map</h3>
+                  <p>Basic layout</p>
+                </div>
+
+                <div id="flow-map" class="flow-map"></div>
+              </section>
+
+              <section class="workspace-card detail-card">
+                <h3>Entry rules</h3>
+                <ul id="entry-conditions"></ul>
+              </section>
+
+              <section class="workspace-card detail-card">
+                <h3>Patterns used</h3>
+                <ul id="supported-patterns"></ul>
+              </section>
+
+              <section class="workspace-card detail-card span-two">
+                <h3>Steps</h3>
+                <ol id="steps-list" class="steps-list"></ol>
+              </section>
+
+              <section class="workspace-card detail-card">
+                <h3>Notes</h3>
+                <ul id="notes-list"></ul>
+              </section>
+
+              <section class="workspace-card detail-card">
+                <div class="json-head">
+                  <h3>JSON view</h3>
+                  <button type="button" class="secondary" id="copy-json-button">Copy json</button>
+                </div>
+                <pre id="json-output"></pre>
+              </section>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
