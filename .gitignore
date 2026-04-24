@@ -5,3 +5,4 @@ We sh__pycache__/
 .DS_Store
 .venv/
 .env
+deliverables/*
