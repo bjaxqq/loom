@@ -2,7 +2,7 @@
 
 Loom turns plain-English business process descriptions into structured Salesforce Flow blueprints.
 
-Live at: [loom-bjaxqq.vercel.app](https://loom-bjaxqq.vercel.app)
+Live at: [loom-liard.vercel.app/](loom-liard.vercel.app/)
 
 
 ## What it does
